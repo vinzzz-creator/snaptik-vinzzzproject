@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TikGrab – Unduh video TikTok tanpa watermark</title>
+<meta name="description" content="Tempel link TikTok, unduh video MP4, HD, atau audio MP3 tanpa watermark.">
+<meta name="theme-color" content="#25F4EE">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23FFDD33'/%3E%3Cpath d='M16 6v13m-6-5 6 6 6-6M8 25h16' stroke='%23000' stroke-width='3' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#000; --paper:#ececec; --white:#fff;
+  --cyan:#25F4EE; --pink:#FE2C55; --yellow:#FFDD33;
+  --bd:3px solid var(--ink);
+  --sh:6px 6px 0 var(--ink);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{
+  font-family:'Space Grotesk',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  background-color:var(--paper);
+  background-image:radial-gradient(rgba(0,0,0,.22) 1.2px,transparent 1.2px);
+  background-size:22px 22px;
+  color:var(--ink); line-height:1.5; min-height:100vh;
+}
+button,input{font:inherit;color:inherit}
+button{cursor:pointer}
+.ic{width:1.3em;height:1.3em;fill:none;stroke:currentColor;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.spin{animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+:focus-visible{outline:4px solid var(--ink);outline-offset:3px}
+
+.wrap{max-width:880px;margin:0 auto;padding:20px 16px 56px}
+
+/* Header */
+header{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:6px 0 44px}
+.logo{display:flex;align-items:center;gap:12px;font-weight:700;font-size:1.35rem;letter-spacing:-.02em}
+.logo i{display:grid;place-items:center;width:46px;height:46px;background:var(--yellow);border:var(--bd);box-shadow:4px 4px 0 var(--ink)}
+.pill{display:inline-flex;align-items:center;gap:8px;padding:7px 12px;background:var(--white);border:var(--bd);font-weight:700;font-size:.9rem}
+
+/* Hero */
+h1{font-size:clamp(2.3rem,7.5vw,4.4rem);line-height:1;letter-spacing:-.035em;font-weight:700;max-width:15ch}
+.lead{margin-top:18px;font-size:1.1rem;max-width:46ch}
+.chips{display:flex;flex-wrap:wrap;gap:10px;margin:22px 0 34px}
+.chips .pill:nth-child(1){background:var(--cyan)}
+.chips .pill:nth-child(2){background:var(--yellow)}
+.chips .pill:nth-child(3){background:var(--pink)}
+
+/* Form */
+form{display:flex;gap:14px}
+.field{flex:1;min-width:0;display:flex;align-items:center;gap:10px;padding:0 10px 0 16px;background:var(--white);border:var(--bd);box-shadow:var(--sh)}
+.field:focus-within{outline:4px solid var(--ink);outline-offset:3px}
+.field input{flex:1;min-width:0;height:62px;border:0;background:transparent;font-weight:500;font-size:1.05rem;outline:none}
+.field input::placeholder{color:rgba(0,0,0,.45)}
+.mini{display:grid;place-items:center;width:42px;height:42px;background:var(--cyan);border:var(--bd);transition:transform .08s}
+.mini:active{transform:translate(2px,2px)}
+.mini[hidden]{display:none}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;padding:0 30px;height:68px;background:var(--pink);border:var(--bd);box-shadow:var(--sh);font-weight:700;font-size:1.2rem;transition:transform .08s,box-shadow .08s}
+.btn:hover{transform:translate(-2px,-2px);box-shadow:8px 8px 0 var(--ink)}
+.btn:active{transform:translate(6px,6px);box-shadow:0 0 0 var(--ink)}
+.btn:disabled{cursor:progress;background:var(--yellow)}
+
+/* Output */
+#out{margin-top:36px}
+.state{display:flex;align-items:center;gap:16px;padding:22px;background:var(--white);border:var(--bd);box-shadow:var(--sh)}
+.state .badge{display:grid;place-items:center;width:54px;height:54px;border:var(--bd);background:var(--yellow);flex:none}
+.state.err .badge{background:var(--pink)}
+.state.empty{border-style:dashed;box-shadow:none;background:transparent}
+.state b{display:block;font-size:1.15rem}
+.state span{display:block;opacity:.8}
+.bar{height:16px;margin-top:10px;border:var(--bd);background:repeating-linear-gradient(-45deg,var(--cyan) 0 14px,var(--white) 14px 28px);background-size:40px 100%;animation:bar .7s linear infinite}
+@keyframes bar{to{background-position:40px 0}}
+
+.card{display:grid;grid-template-columns:minmax(0,260px) 1fr;gap:26px;padding:22px;background:var(--white);border:var(--bd);box-shadow:8px 8px 0 var(--ink)}
+.thumb{aspect-ratio:3/4;display:grid;place-items:center;background:var(--yellow);border:var(--bd);overflow:hidden}
+.thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.thumb .ic{width:3rem;height:3rem}
+.info{min-width:0;display:flex;flex-direction:column;gap:16px}
+.ok{align-self:flex-start;background:var(--cyan)}
+.title{font-size:1.3rem;font-weight:700;line-height:1.25;letter-spacing:-.01em;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere}
+.links{display:flex;flex-direction:column;gap:14px;margin-top:auto}
+.row{display:flex;gap:10px}
+.dl{flex:1;min-width:0;display:flex;align-items:center;gap:12px;padding:10px 14px 10px 10px;text-align:left;background:var(--c,var(--cyan));border:var(--bd);box-shadow:4px 4px 0 var(--ink);font-weight:700;transition:transform .08s,box-shadow .08s}
+.dl:hover{transform:translate(-2px,-2px);box-shadow:6px 6px 0 var(--ink)}
+.dl:active{transform:translate(4px,4px);box-shadow:0 0 0 var(--ink)}
+.dl .lead-ic{display:grid;place-items:center;width:40px;height:40px;background:var(--white);border:var(--bd);flex:none}
+.dl .t{flex:1;min-width:0;line-height:1.25;overflow-wrap:anywhere}
+.cp{width:56px;flex:none;display:grid;place-items:center;background:var(--white);border:var(--bd);box-shadow:4px 4px 0 var(--ink);transition:transform .08s,box-shadow .08s}
+.cp:hover{transform:translate(-2px,-2px);box-shadow:6px 6px 0 var(--ink)}
+.cp:active{transform:translate(4px,4px);box-shadow:0 0 0 var(--ink)}
+
+/* Footer & toast */
+footer{margin-top:48px;padding-top:20px;border-top:var(--bd);display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px;font-size:.92rem}
+footer span{display:inline-flex;align-items:center;gap:8px}
+#toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,24px);opacity:0;pointer-events:none;display:flex;align-items:center;gap:10px;padding:12px 18px;background:var(--yellow);border:var(--bd);box-shadow:var(--sh);font-weight:700;transition:.2s;z-index:9;max-width:calc(100vw - 32px)}
+#toast.show{opacity:1;transform:translate(-50%,0)}
+
+@media (max-width:640px){
+  header{padding-bottom:30px}
+  form{flex-direction:column}
+  .btn{width:100%}
+  .card{grid-template-columns:1fr;padding:16px;gap:18px}
+  .thumb{aspect-ratio:4/3}
+  .state{padding:16px}
+}
+@media (prefers-reduced-motion:reduce){
+  .spin,.bar{animation:none}
+  *{transition:none!important}
+}
+</style>
+</head>
+<body>
+
+<!-- Icon sprite -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-download" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></symbol>
+  <symbol id="i-link" viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></symbol>
+  <symbol id="i-paste" viewBox="0 0 24 24"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></symbol>
+  <symbol id="i-video" viewBox="0 0 24 24"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></symbol>
+  <symbol id="i-hd" viewBox="0 0 24 24"><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M21 8V5a2 2 0 0 0-2-2h-3"/><path d="M3 16v3a2 2 0 0 0 2 2h3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/><rect x="8" y="8" width="8" height="8" rx="1"/></symbol>
+  <symbol id="i-music" viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></symbol>
+  <symbol id="i-alert" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></symbol>
+  <symbol id="i-loader" viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></symbol>
+  <symbol id="i-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></symbol>
+  <symbol id="i-image" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></symbol>
+  <symbol id="i-code" viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></symbol>
+  <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></symbol>
+</svg>
+
+<div class="wrap">
+  <header>
+    <div class="logo"><i><svg class="ic" aria-hidden="true"><use href="#i-download"/></svg></i>TikGrab</div>
+    <span class="pill"><svg class="ic" aria-hidden="true"><use href="#i-code"/></svg>API NexaDev</span>
+  </header>
+
+  <main>
+    <h1>Simpan video TikTok tanpa watermark.</h1>
+    <p class="lead">Tempel link videonya, tekan Unduh, lalu pilih format yang kamu mau.</p>
+
+    <div class="chips">
+      <span class="pill"><svg class="ic" aria-hidden="true"><use href="#i-shield"/></svg>Tanpa watermark</span>
+      <span class="pill"><svg class="ic" aria-hidden="true"><use href="#i-hd"/></svg>Kualitas HD</span>
+      <span class="pill"><svg class="ic" aria-hidden="true"><use href="#i-music"/></svg>Audio MP3</span>
+    </div>
+
+    <form id="form" novalidate>
+      <label class="field">
+        <svg class="ic" aria-hidden="true"><use href="#i-link"/></svg>
+        <input id="url" type="url" inputmode="url" autocomplete="off" spellcheck="false" placeholder="https://vt.tiktok.com/..." aria-label="Link video TikTok">
+        <button type="button" id="paste" class="mini" aria-label="Tempel dari clipboard"><svg class="ic" aria-hidden="true"><use href="#i-paste"/></svg></button>
+        <button type="button" id="clear" class="mini" aria-label="Hapus link" hidden><svg class="ic" aria-hidden="true"><use href="#i-x"/></svg></button>
+      </label>
+      <button class="btn" id="go" type="submit"><svg class="ic" aria-hidden="true"><use href="#i-download"/></svg><span>Unduh</span></button>
+    </form>
+
+    <section id="out" aria-live="polite"></section>
+  </main>
+
+  <footer>
+    <span><svg class="ic" aria-hidden="true"><use href="#i-code"/></svg>Data dari NexaDev API</span>
+    <span><svg class="ic" aria-hidden="true"><use href="#i-info"/></svg>Unduh hanya konten milikmu atau yang sudah diizinkan pemiliknya.</span>
+  </footer>
+</div>
+
+<div id="toast" role="status"></div>
+
+<script>
+const API = "https://api.nexadev.my.id/api/snaptik/?url=";
+
+const $ = (s) => document.querySelector(s);
+const out = $("#out"), input = $("#url"), go = $("#go"), clearBtn = $("#clear");
+
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const ic = (n, cls = "") => `<svg class="ic ${cls}" aria-hidden="true"><use href="#i-${n}"/></svg>`;
+
+/* ---------- Toast ---------- */
+let toastTimer;
+function toast(msg, icon = "check") {
+  const t = $("#toast");
+  t.innerHTML = ic(icon) + `<span>${esc(msg)}</span>`;
+  t.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove("show"), 2400);
+}
+
+/* ---------- Tampilan state ---------- */
+function showEmpty() {
+  out.innerHTML = `<div class="state empty"><div class="badge">${ic("link")}</div>
+    <div><b>Belum ada video</b><span>Tempel link TikTok di atas, lalu tekan Unduh.</span></div></div>`;
+}
+function showLoading() {
+  out.innerHTML = `<div class="state"><div class="badge">${ic("loader", "spin")}</div>
+    <div style="flex:1"><b>Mengambil video…</b><span>Mohon tunggu sebentar.</span><div class="bar"></div></div></div>`;
+}
+function showError(title, msg) {
+  out.innerHTML = `<div class="state err"><div class="badge">${ic("alert")}</div>
+    <div><b>${esc(title)}</b><span>${esc(msg)}</span></div></div>`;
+}
+
+/* ---------- Hasil (parse JSON dari API) ---------- */
+const KINDS = {
+  video: { icon: "video",  color: "var(--cyan)",   ext: "mp4" },
+  hd:    { icon: "hd",     color: "var(--yellow)", ext: "mp4" },
+  audio: { icon: "music",  color: "var(--pink)",   ext: "mp3" },
+};
+const kindOf = (t) => (/mp3|audio/i.test(t) ? "audio" : /hd/i.test(t) ? "hd" : "video");
+
+function showResult(data) {
+  const title = (data.title || "Video TikTok").trim();
+  const slug = title.replace(/#\S+/g, "").replace(/[^\w\s-]/g, "").trim().slice(0, 40).replace(/\s+/g, "-") || "video";
+
+  const links = data.download_links.map((l) => {
+    const k = kindOf(l.type || ""), m = KINDS[k];
+    const label = String(l.type || "Unduh").replace(/^Download\s+/i, "");
+    return `<div class="row">
+      <button class="dl" style="--c:${m.color}" data-url="${esc(l.url)}" data-name="tiktok-${esc(slug)}-${k}.${m.ext}">
+        <span class="lead-ic">${ic(m.icon)}</span>
+        <span class="t">${esc(label)}</span>
+        <span class="go-ic">${ic("download")}</span>
+      </button>
+      <button class="cp" data-copy="${esc(l.url)}" aria-label="Salin link ${esc(label)}">${ic("copy")}</button>
+    </div>`;
+  }).join("");
+
+  const thumb = data.thumbnail
+    ? `<img src="${esc(data.thumbnail)}" alt="Thumbnail video" referrerpolicy="no-referrer" onerror="this.replaceWith(document.createRange().createContextualFragment('${ic("image").replace(/'/g, "\\'")}'))">`
+    : ic("image");
+
+  out.innerHTML = `<article class="card">
+    <div class="thumb">${thumb}</div>
+    <div class="info">
+      <span class="pill ok">${ic("check")}Siap diunduh</span>
+      <h2 class="title">${esc(title)}</h2>
+      <div class="links">${links}</div>
+    </div>
+  </article>`;
+}
+
+/* ---------- Ambil data dari API ---------- */
+async function fetchVideo(link) {
+  const res = await fetch(API + encodeURIComponent(link));
+  if (!res.ok) throw new Error("Server membalas dengan kode " + res.status + ".");
+  const data = await res.json();
+  if (!data.status || !Array.isArray(data.download_links) || !data.download_links.length) {
+    throw new Error("Video tidak ditemukan atau bersifat privat.");
+  }
+  return data;
+}
+
+$("#form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const link = input.value.trim();
+  if (!/^https?:\/\/([\w-]+\.)*tiktok\.com\//i.test(link)) {
+    showError("Link tidak valid", "Masukkan link video TikTok, misalnya https://vt.tiktok.com/xxxx.");
+    input.focus();
+    return;
+  }
+  go.disabled = true;
+  go.innerHTML = ic("loader", "spin") + "<span>Memproses</span>";
+  showLoading();
+  try {
+    showResult(await fetchVideo(link));
+  } catch (err) {
+    const offline = err instanceof TypeError;
+    showError("Gagal mengambil video", offline ? "Tidak bisa terhubung ke server. Periksa koneksi internetmu lalu coba lagi." : err.message);
+  } finally {
+    go.disabled = false;
+    go.innerHTML = ic("download") + "<span>Unduh</span>";
+  }
+});
+
+/* ---------- Unduh & salin ---------- */
+async function saveFile(btn) {
+  const { url, name } = btn.dataset;
+  const slot = btn.querySelector(".go-ic");
+  slot.innerHTML = ic("loader", "spin");
+  btn.disabled = true;
+  try {
+    const r = await fetch(url);
+    if (!r.ok) throw new Error();
+    const blob = await r.blob();
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = name;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+    toast("Unduhan dimulai");
+  } catch {
+    // CDN tidak mengizinkan unduh langsung: buka di tab baru
+    window.open(url, "_blank", "noopener");
+    toast("Dibuka di tab baru. Tekan tahan untuk menyimpan.", "info");
+  } finally {
+    slot.innerHTML = ic("download");
+    btn.disabled = false;
+  }
+}
+
+async function copyText(text) {
+  try {
+    await navigator.clipboard.writeText(text);
+    toast("Link disalin");
+  } catch {
+    toast("Gagal menyalin link", "alert");
+  }
+}
+
+out.addEventListener("click", (e) => {
+  const dl = e.target.closest(".dl");
+  if (dl) return saveFile(dl);
+  const cp = e.target.closest(".cp");
+  if (cp) copyText(cp.dataset.copy);
+});
+
+/* ---------- Input helpers ---------- */
+const syncClear = () => { clearBtn.hidden = !input.value; };
+input.addEventListener("input", syncClear);
+
+$("#paste").addEventListener("click", async () => {
+  try {
+    const text = await navigator.clipboard.readText();
+    if (!text) return toast("Clipboard kosong", "info");
+    input.value = text.trim();
+    syncClear();
+    input.focus();
+  } catch {
+    toast("Izin clipboard ditolak. Tempel manual dengan Ctrl+V.", "alert");
+  }
+});
+
+clearBtn.addEventListener("click", () => {
+  input.value = "";
+  syncClear();
+  input.focus();
+  showEmpty();
+});
+
+showEmpty();
+</script>
+</body>
+</html>
